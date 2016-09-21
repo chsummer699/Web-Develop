@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>jQuery选择器</title>
+	<style type="text/css">
+		#p1{
+			display:none;
+		}
+	</style>
+	<script src ="jquery-1.11.3.min.js"></script>
+	<script >
+			$(document).ready(function(){
+						$("button").click(function(){
+									 // $("#p1").hide();
+									// $("#p1").slideDown(1000);
+									// $("#p1").slideUp(1000);
+									// $("#p1").slideToggle();
+									// $("#p1").hide();
+									// $(".ct").hide();
+									// $(this).toggle(500);
+									// alert($("#p1").text());
+									// alert($("#p1").html());
+					});
+
+						// $("#account").change(function(){
+						// 		document.getElementById("chinese-account").innerHTML = $("#account").val();
+						// });
+
+			});
+	</script>
+	<script type="text/javascript">
+			function OnInput(event){
+						value = document.getElementById("account").value
+						// document.getElementById("chinese-account").innerHTML = value;
+						if (value=="")
+							document.getElementById("chinese-account").innerHTML = "";
+						else
+							document.getElementById("chinese-account").innerHTML = moneyprocess(value);
+						
+
+			}
+
+			function moneyprocess(money){//主函数
+
+				if(/\./.test(money)){
+					var strs = money.split(".");
+					if (strs.length >2){
+						console.log("数字非法");
+						return "格式不对";
+					}
+					intpart = strs[0];
+					dotpart = strs[1];
+				
+					var intval = intprocess(intpart);
+					var dotval = dotprocess(dotpart);
+					if (intval == ""){
+						return dotval.replace(/\u6574$/,"");
+					}
+					else
+						return intval+dotval;
+				}
+				else{
+					var intval = intprocess(money);
+					if (intval =="")
+						var dotval = "";
+					else
+						var dotval = "整";
+					return intval+dotval;
+				}
+					 // console.log(intval);
+					 // console.log(dotval);
+			}
+			
+			function dotprocess(dotpart){ //小数部分合法性判断
+				var dotdata = dotpart;
+				if(isNaN(dotdata)){
+					// console.log("数字非法");
+					return ;
+				}
+				if(dotdata.length>2){
+					console.log("小数部分长度过长！");
+					// dotdata = dotdata[2]>'5'?(parseInt(dotdata.substr(0,2))+1).toString():dotdata.substr(0,2);
+					dotdata = dotdata.substr(0,2);
+					console.log(dotdata);
+				}
+				if(dotdata=="")
+					return "整";
+				return dotparse(dotdata);
+
+			}
+
+			function intprocess(intpart){ //整数部分合法性判断
+				var intdata = intpart;
+				if((/^\d+$/.test(intdata))==false){ 
+					console.log("非法");
+					return ;
+				}
+				// intdata = trimleft(intdata);
+				intdata = zeroadd(intdata,16);
+				// console.log("--------"+intdata+"---------");
+				if(intdata.length > 16){
+					console.log("整数部分长度过长！");
+					intdata = intdata.substring(0,16);
+					console.log(intdata);
+				}
+				return intparse(intdata);
+				// return intdata;
+			}
+
+			function trimleft(data){ //去掉字符串左边的零
+				len = data.length;
+				for(i = 0; i < len; i++){
+					if(data[i]=='0')
+						continue;
+					else {
+						return data.substr(i);
+
+					}
+				}
+				return data.substr(len-1);
+			}
+
+			function intparse(data){//整型数据的处理
+				var list = ['零','壹','贰','叁','肆','伍','陆','柒','捌', '玖'];
+				var list_label =['仟','佰','拾'];
+				res = [];
+				part1 = data.substr(0,4);
+				part2 = data.substr(4,4);
+				part3 = data.substr(8,4);
+				part4 = data.substr(12);
+				var len = trimleft(data).length;
+				if (/0000/.test(part1)) {
+					// console.log("全是零");
+					res.push("");
+				}
+				else {
+					part1 = common_process(part1);
+					res.push(part1.replace(/^\u96f6/,""));
+					res.push("兆");
+
+				}
+
+				if (/0000/.test(part2)) {
+					// console.log("全是零");
+					res.push("");
+				}
+				else {
+					part2 = common_process(part2);
+					if (len < 13) {
+						res.push(part2.replace(/^\u96f6/,""));
+						
+					}
+					else{
+						res.push(part2);
+					}
+					res.push("亿");
+
+				}
+
+				if (/0000/.test(part3)) {
+					// console.log("全是零");
+					res.push("");
+				}
+				else {
+					part3 = common_process(part3);
+					if (len < 9) {
+						res.push(part3.replace(/^\u96f6/,""));
+						
+					}
+					else{
+						res.push(part3);
+					}
+					res.push("万");
+				} 
+
+				if (/0000/.test(part4)) {
+					// console.log("全是零");
+					res.push("");
+				}
+				else {
+					part4 = common_process(part4);
+					if (len < 5) {
+						res.push(part4.replace(/^\u96f6/,""));
+						
+					}
+					else{
+						res.push(part4);
+					}
+					res.push("圆");
+				} 
+				return res.join("");
+
+			}
+
+			function common_process(data){
+					var list = ['零','壹','贰','叁','肆','伍','陆','柒','捌', '玖'];
+					var list_label =['仟','佰','拾'];
+					var res = [];
+					for (i = 0; i < data.length-1; i++){
+						if(data[i]='0')
+							res.push(list[0]);
+						else{
+							res.push(list[parseInt(data[i])]);
+							res.push(list_label[i]);
+						}
+					}
+					if (data[3] =='0')
+						res.push("");
+					else {
+						res.push(list[parseInt(data[3])]);
+					}
+					res = res.join("");
+					return res.replace(/\u96f6{2,}/,"\u96f6").replace(/\u96f6$/,"");
+			}
+
+			function dotparse(data){//小数部分的处理
+				var list_label = ['角', '分'];
+				var list = ['零','壹','贰','叁','肆','伍','陆','柒','捌', '玖'];
+
+				var temp = [];
+				var len = data.length;
+				for(i=0; i<len;i++){
+					if(data[i]=='0')
+						temp.push("");
+					else{
+						temp.push(list[parseInt(data[i])]);
+						temp.push(list_label[i]);
+					}
+				}
+				return temp.join("");
+			}
+
+			function zeroadd(data,n){
+				return (Array(n).join('0')+data).slice(-n);
+			}
+	</script>
+	<script src="echarts.min.js"></script>
+	
+</head>
+<body>
+			<p id="p1">点按钮我就消失<a href="#"></a></p>
+			<p id="p2" class="ct">点按钮我也消失</p>
+			<button >点我啊</button>
+			<p>输入金钱数：</p><input type="text" oninput="OnInput(event)" name="account" id="account"><span id="chinese-account"></span>
+
+			<div id="chart" style="width:600px;height:400px;"></div>
+</body>
+</html>
