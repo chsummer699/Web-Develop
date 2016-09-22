@@ -84,10 +84,9 @@
 					dotdata = dotdata.substr(0,2);
 					console.log(dotdata);
 				}
-				if(dotdata=="")
+				if(dotdata==""||dotdata=="0")
 					return "整";
 				return dotparse(dotdata);
-
 			}
 
 			function intprocess(intpart){ //整数部分合法性判断
