@@ -1,0 +1,4 @@
+#这里主要参考的是网上的例子
+遇到的问题集合：
+1）在windows上使用easy_install 命令下载sqlalchemy-migrate会自动加载相关依赖包，如果手动单独安装的话，依赖包会丢失。
+http://www.pythondoc.com/flask-mega-tutorial/followers.html
